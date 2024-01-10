@@ -1,0 +1,172 @@
+﻿@{
+    ViewData["Title"] = "Kategoriler";
+}
+
+<div class="container mt-5">
+    <div class="text-center">
+        <h2 class="display-4">Kategoriler</h2>
+        <hr class="my-4" />
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Başlık</th>
+                            <th scope="col">Düzenle</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoryTableBody">
+                        <!-- Kategoriler buraya yüklenecek -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <h3 id="baslik" class="mb-4">Kategori Düzenle</h3>
+
+                    <div class="mb-3">
+                        <label for="txtCategory">Kategori Adı</label>
+                        <input type="text" class="form-control" id="txtCategory" />
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="hidden" id="txtId" />
+                        <button class="btn btn-success btn-block" id="btnKaydet">Kaydet</button>
+                        <button class="btn btn-secondary btn-block" id="btnVazgec">Vazgeç</button>
+                        <button class="btn btn-danger btn-block" id="btnSil">Sil</button>
+                    </div>
+                    <div class="alert" id="sonuc"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Düzenleme Formunu Gizle
+            $("#txtCategory").val("");
+            $("#txtId").val("");
+            $("#btnVazgec").hide();
+            $("#btnSil").hide();
+
+            // Kategorileri Yükle
+            LoadCategories();
+
+            // Kaydet Butonuna Tıklanınca
+            $("#btnKaydet").click(function () {
+                var name = $("#txtCategory").val();
+                var id = $("#txtId").val();
+
+                if (name == "" || name == null) {
+                    $("#sonuc")
+                        .removeClass()
+                        .addClass("alert alert-danger")
+                        .html("Kategori Adı Giriniz!");
+                    return false;
+                }
+
+                $.ajax({
+                    url: "/Category/CategoryAddEditAjax",
+                    type: "POST",
+                    data: { CategoryID: id, Name: name },
+                    success: function (data) {
+                        if (data.status) {
+                            $("#sonuc")
+                                .removeClass()
+                                .addClass("alert alert-success")
+                                .html(data.message);
+                            LoadCategories();
+                        } else {
+                            $("#sonuc")
+                                .removeClass()
+                                .addClass("alert alert-danger")
+                                .html(data.message);
+                        }
+                    },
+                    error: function (e) { }
+                });
+            });
+
+            // Düzenle Butonuna Tıklanınca
+            $(document).on("click", ".edit", function () {
+                var id = $(this).closest("tr").attr("id");
+                $("#baslik").html("Kayıt Düzenle");
+                $("#btnVazgec").show();
+                $("#btnSil").show();
+                $.ajax({
+                    url: "/Category/CategoryByIdAjax",
+                    type: "GET",
+                    data: { id: id },
+                    success: function (data) {
+                        $("#txtCategory").val(data.name);
+                        $("#txtId").val(data.categoryID);
+                    },
+                    error: function () { }
+                });
+            });
+
+            // Vazgeç Butonuna Tıklanınca
+            $("#btnVazgec").click(function () {
+                $("#txtCategory").val("");
+                $("#txtId").val("");
+                $("#baslik").html("");
+                $("#btnVazgec").hide();
+                $("#btnSil").hide();
+            });
+
+            // Sil Butonuna Tıklanınca
+            $("#btnSil").click(function () {
+                var id = $("#txtId").val();
+                $.ajax({
+                    url: "/Category/CategoryRemoveAjax",
+                    type: "POST",
+                    data: { id: id },
+                    success: function (data) {
+                        if (data.status) {
+                            $("#sonuc")
+                                .removeClass()
+                                .addClass("alert alert-success")
+                                .html(data.message);
+                            LoadCategories();
+                        } else {
+                            $("#sonuc")
+                                .removeClass()
+                                .addClass("alert alert-danger")
+                                .html(data.message);
+                        }
+                    },
+                    error: function () { }
+                });
+            });
+
+            // Kategorileri Yükle
+            function LoadCategories() {
+                $.ajax({
+                    url: "/Category/CategoryListAjax",
+                    type: "GET",
+                    success: function (data) {
+                        var rows = "";
+                        $.each(data, function (index, item) {
+                            rows += "<tr id='" + item.categoryID + "'>";
+                            rows += "<td>" + (index + 1) + "</td>";
+                            rows += "<td>" + item.name + "</td>";
+                            rows += "<td><a href='javascript:void(0);' class='btn btn-warning btn-sm edit'>Düzenle</a></td>";
+                            rows += "</tr>";
+                        });
+                        $("#categoryTableBody").html(rows);
+                    },
+                    error: function () { }
+                });
+            }
+        });
+    </script>
+}

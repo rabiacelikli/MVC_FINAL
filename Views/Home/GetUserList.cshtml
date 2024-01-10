@@ -1,0 +1,30 @@
+﻿@inject uyg1.Models.AppDbContext _appDbContext﻿
+@{
+    ViewData["Title"] = "GetUserList";
+}
+@model List<UserModel>
+<h1>Kullanıcılar</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Adı Soyadı</th>
+            <th>Kullanıcı Adı</th>
+            <th>E-Posta</th>
+           
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in _appDbContext.Users.ToList())
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.FullName</td>
+                <td>@item.UserName</td>
+                <td>@item.Email</td>
+               
+            </tr>
+        }
+
+    </tbody>
+</table>

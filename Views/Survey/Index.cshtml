@@ -1,0 +1,218 @@
+﻿@{
+    ViewData["Title"] = "Anketler";
+}
+
+<div class="container mt-5">
+    <div class="text-center">
+        <h2 class="display-4">Anketler</h2>
+        <hr class="my-4" />
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Başlık</th>
+                            <th scope="col">Açıklama</th>
+                            <th scope="col">Kategori ID</th>
+                            <th scope="col">Ekleyen Kullanıcı</th>
+                            <th scope="col">Sorular</th>
+                            <th scope="col">Düzenle</th>
+                        </tr>
+                    </thead>
+                    <tbody id="surveyTableBody">
+                        <!-- Anketler buraya yüklenecek -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <h3 id="baslik" class="mb-4">Anket Düzenle</h3>
+
+                    <div class="mb-3">
+                        <label for="txtTitle">Anket Başlığı</label>
+                        <input type="text" class="form-control" id="txtTitle" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="txtDescription">Anket Açıklama</label>
+                        <textarea class="form-control" id="txtDescription"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ddlCategory">Kategori</label>
+                        <select class="form-control" id="ddlCategory">
+                            <!-- Kategorileri buradan yükleyebilirsiniz -->
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="hidden" id="txtId" />
+                        <button class="btn btn-success btn-block" id="btnKaydet">Kaydet</button>
+                        <button class="btn btn-secondary btn-block" id="btnVazgec">Vazgeç</button>
+                        <button class="btn btn-danger btn-block" id="btnSil">Sil</button>
+                    </div>
+                    <div class="alert" id="sonuc"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Düzenleme Formunu Gizle
+            $("#txtTitle").val("");
+            $("#txtDescription").val("");
+            $("#ddlCategory").val("");
+            $("#txtId").val("");
+            $("#btnVazgec").hide();
+            $("#btnSil").hide();
+
+            // Anketleri ve Kategorileri Yükle
+            LoadSurveys();
+            LoadCategories();
+
+            // Kaydet Butonuna Tıklanınca
+            $("#btnKaydet").click(function () {
+                var title = $("#txtTitle").val();
+                var description = $("#txtDescription").val();
+                var categoryId = $("#ddlCategory").val();
+                var id = $("#txtId").val();
+
+                if (title == "" || title == null) {
+                    $("#sonuc")
+                        .removeClass()
+                        .addClass("alert alert-danger")
+                        .html("Başlık Giriniz!");
+                    return false;
+                }
+
+                $.ajax({
+                    url: "/Survey/SurveyAddEditAjax",
+                    type: "POST",
+                    data: { SurveyID: id, Title: title, Description: description, CategoryID: categoryId },
+                    success: function (data) {
+                        if (data.status) {
+                            $("#sonuc")
+                                .removeClass()
+                                .addClass("alert alert-success")
+                                .html(data.message);
+                            LoadSurveys();
+                        } else {
+                            $("#sonuc")
+                                .removeClass()
+                                .addClass("alert alert-danger")
+                                .html(data.message);
+                        }
+                    },
+                    error: function (e) { }
+                });
+            });
+
+            // Düzenle Butonuna Tıklanınca
+            $(document).on("click", ".edit", function () {
+                var id = $(this).closest("tr").attr("id");
+                $("#baslik").html("Kayıt Düzenle");
+                $("#btnVazgec").show();
+                $("#btnSil").show();
+                $.ajax({
+                    url: "/Survey/SurveyByIdAjax",
+                    type: "Get",
+                    data: { id: id },
+                    success: function (data) {
+                        $("#txtTitle").val(data.title);
+                        $("#txtDescription").val(data.description);
+                        $("#ddlCategory").val(data.categoryID);
+                        $("#txtId").val(data.surveyID);
+                    },
+                    error: function () { }
+                });
+            });
+
+            // Vazgeç Butonuna Tıklanınca
+            $("#btnVazgec").click(function () {
+                $("#txtTitle").val("");
+                $("#txtDescription").val("");
+                $("#ddlCategory").val("");
+                $("#txtId").val("");
+                $("#baslik").html("");
+                $("#btnVazgec").hide();
+                $("#btnSil").hide();
+
+            });
+
+            // Sil Butonuna Tıklanınca
+            $("#btnSil").click(function () {
+                var id = $("#txtId").val();
+                $.ajax({
+                    url: "/Survey/SurveyRemoveAjax",
+                    type: "Get",
+                    data: { id: id },
+                    success: function (data) {
+                        if (data.status) {
+                            $("#sonuc")
+                                .removeClass()
+                                .addClass("alert alert-success")
+                                .html(data.message);
+                            LoadSurveys();
+                        } else {
+                            $("#sonuc")
+                                .removeClass()
+                                .addClass("alert alert-danger")
+                                .html(data.message);
+                        }
+                    },
+                    error: function () { }
+                });
+            });
+
+            function LoadSurveys() {
+                $.ajax({
+                    url: "/Survey/SurveyListAjax",
+                    type: "Get",
+                    success: function (data) {
+                        var rows = "";
+                        $.each(data, function (index, item) {
+                            rows += "<tr id='" + item.surveyID + "'>";
+                            rows += "<td>" + (index + 1) + "</td>";
+                            rows += "<td>" + item.title + "</td>";
+                            rows += "<td>" + item.description + "</td>";
+                            rows += "<td>" + item.categoryID + "</td>";
+                            rows += "<td>" + item.userId + "</td>";
+                            rows += "<td><a href='/Question/Index/" + item.surveyID + "' class='btn btn-info btn-sm'>Sorular</a></td>";
+                            rows += "<td><a href='javascript:void(0);' class='btn btn-warning btn-sm edit'>Düzenle</a></td>";
+                            rows += "</tr>";
+                        });
+                        $("#surveyTableBody").html(rows);
+                    },
+                    error: function () { }
+                });
+            }
+
+            // Kategorileri Yükle
+            function LoadCategories() {
+                $.ajax({
+                    url: "/Category/CategoryListAjax",
+                    type: "Get",
+                    success: function (data) {
+                        var options = "<option value=''>Kategori Seçiniz</option>";
+                        $.each(data, function (index, item) {
+                            options += "<option value='" + item.categoryID + "'>" + item.name + "</option>";
+                        });
+                        $("#ddlCategory").html(options);
+                    },
+                    error: function () { }
+                });
+            }
+        });
+    </script>
+}

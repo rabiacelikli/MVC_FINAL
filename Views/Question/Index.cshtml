@@ -1,0 +1,178 @@
+﻿@{
+    ViewData["Title"] = "Sorular";
+}
+
+<div class="container mt-5">
+    <div class="text-center">
+        <h2 class="display-4">Sorular</h2>
+        <hr class="my-4" />
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Soru</th>
+                            <th scope="col">Ekleyen Kullanıcı</th>
+                            <th scope="col">Cevaplar</th>
+                            <th scope="col">Düzenle</th>
+                        </tr>
+                    </thead>
+                    <tbody id="questionTableBody">
+                        <!-- Sorular buraya yüklenecek -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <h3 id="baslik" class="mb-4">Soru Düzenle</h3>
+
+                    <div class="mb-3">
+                        <label for="txtQuestion">Soru Metni</label>
+                        <textarea class="form-control" id="txtQuestion"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="hidden" id="txtQuestionID" />
+                        <button class="btn btn-success btn-block" id="btnKaydetQuestion">Kaydet</button>
+                        <button class="btn btn-secondary btn-block" id="btnVazgecQuestion">Vazgeç</button>
+                        <button class="btn btn-danger btn-block" id="btnSilQuestion">Sil</button>
+                    </div>
+                    <div class="alert" id="sonucQuestion"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Düzenleme Formunu Gizle
+            $("#txtQuestion").val("");
+            $("#txtQuestionID").val("");
+            $("#btnVazgecQuestion").hide();
+            $("#btnSilQuestion").hide();
+
+            // Soruları Yükle
+            LoadQuestions();
+
+            // Kaydet Butonuna Tıklanınca
+            $("#btnKaydetQuestion").click(function () {
+                var text = $("#txtQuestion").val();
+                var surveyId = /* buraya surveyId'yi alacak bir kod eklenecek */;
+                var id = $("#txtQuestionID").val();
+
+                if (text == "" || text == null) {
+                    $("#sonucQuestion")
+                        .removeClass()
+                        .addClass("alert alert-danger")
+                        .html("Soru metni giriniz!");
+                    return false;
+                }
+
+                $.ajax({
+                    url: "/Question/QuestionAddEditAjax",
+                    type: "POST",
+                    data: { QuestionID: id, Text: text, SurveyID: surveyId },
+                    success: function (data) {
+                        if (data.status) {
+                            $("#sonucQuestion")
+                                .removeClass()
+                                .addClass("alert alert-success")
+                                .html(data.message);
+                            LoadQuestions();
+                        } else {
+                            $("#sonucQuestion")
+                                .removeClass()
+                                .addClass("alert alert-danger")
+                                .html(data.message);
+                        }
+                    },
+                    error: function (e) { }
+                });
+            });
+
+            // Düzenle Butonuna Tıklanınca
+            $(document).on("click", ".editQuestion", function () {
+                var id = $(this).closest("tr").attr("id");
+                $("#baslik").html("Soru Düzenle");
+                $("#btnVazgecQuestion").show();
+                $("#btnSilQuestion").show();
+                $.ajax({
+                    url: "/Question/QuestionByIdAjax",
+                    type: "GET",
+                    data: { id: id },
+                    success: function (data) {
+                        $("#txtQuestion").val(data.text);
+                        $("#txtQuestionID").val(data.questionID);
+                    },
+                    error: function () { }
+                });
+            });
+
+            // Vazgeç Butonuna Tıklanınca
+            $("#btnVazgecQuestion").click(function () {
+                $("#txtQuestion").val("");
+                $("#txtQuestionID").val("");
+                $("#baslik").html("");
+                $("#btnVazgecQuestion").hide();
+                $("#btnSilQuestion").hide();
+            });
+
+            // Sil Butonuna Tıklanınca
+            $("#btnSilQuestion").click(function () {
+                var id = $("#txtQuestionID").val();
+                $.ajax({
+                    url: "/Question/QuestionRemoveAjax",
+                    type: "POST",
+                    data: { id: id },
+                    success: function (data) {
+                        if (data.status) {
+                            $("#sonucQuestion")
+                                .removeClass()
+                                .addClass("alert alert-success")
+                                .html(data.message);
+                            LoadQuestions();
+                        } else {
+                            $("#sonucQuestion")
+                                .removeClass()
+                                .addClass("alert alert-danger")
+                                .html(data.message);
+                        }
+                    },
+                    error: function () { }
+                });
+            });
+
+            // Soruları Yükle
+            function LoadQuestions() {
+                $.ajax({
+                    url: "/Question/QuestionListAjax",
+                    type: "GET",
+                    data: { surveyId: $("#txtSurveyID").val() },
+                    success: function (data) {
+                        var rows = "";
+                        $.each(data, function (index, item) {
+                            rows += "<tr id='" + item.questionID + "'>";
+                            rows += "<td>" + (index + 1) + "</td>";
+                            rows += "<td>" + item.text + "</td>";
+                            rows += "<td>" + item.type + "</td>";
+                            rows += "<td>" + (item.isMultipleChoice ? 'Evet' : 'Hayır') + "</td>";
+                            rows += "<td><a href='javascript:void(0);' class='btn btn-warning btn-sm editQuestion'>Düzenle</a></td>";
+                            rows += "</tr>";
+                        });
+                        $("#questionTableBody").html(rows);
+                    },
+                    error: function () { }
+                });
+            }
+        });
+    </script>
+}

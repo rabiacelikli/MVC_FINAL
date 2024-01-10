@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\uyg1.props" />
+</Project>

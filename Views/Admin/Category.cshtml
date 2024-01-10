@@ -1,0 +1,340 @@
+﻿
+@{
+    ViewData["Title"] = "Category";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdminLTE 3 | Simple Tables</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+
+
+  <!-- Main Sidebar Container -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a asp-action="Index" class="brand-link">
+      <img src="~/AdminLTE/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <span class="brand-text font-weight-light">AdminLTE 3</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Sidebar user (optional) -->
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+            <img src="~/Photos/pp.png" class="img-circle elevation-2" alt="User Image" style="width:30px">
+        </div>
+        <div class="info">
+            <a href="#" class="d-block">@User.Identity.Name</a>
+        </div>
+      </div>
+
+      <!-- SidebarSearch Form -->
+      <div class="form-inline">
+        <div class="input-group" data-widget="sidebar-search">
+          <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+          <div class="input-group-append">
+            <button class="btn btn-sidebar">
+              <i class="fas fa-search fa-fw"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Add icons to the links using the .nav-icon class
+                             with font-awesome or any other icon font library -->
+                        <li class="nav-item menu-open">
+                            <a href="#" class="nav-link active">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>
+                                    Dashboard
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Admin" asp-action="AdminUser" class="nav-link">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>
+                                    Kullanıcılar
+
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Admin" asp-action="GetRoleList" class="nav-link">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>
+                                    Roller
+
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Admin" asp-action="Category" class="nav-link">
+                                <i class="nav-icon fas fa-address-book"></i>
+                                <p>
+                                    Kategoriler
+
+
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Admin" asp-action="Survey" class="nav-link">
+                                <i class="nav-icon fas fa-copy"></i>
+                                <p>
+                                    Anketler
+
+                                </p>
+                            </a>
+                        </li>
+
+
+                        
+
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Kategoriler</h1>
+          
+          </div>
+
+        </div>
+
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <!-- DersEkle.cshtml -->
+    
+
+            
+            
+            <div class="row">
+                <div class="col-md-8">
+                    <div id="progress"></div>
+
+                    <table class="table" id="tbCategories">
+                        <thead>
+                            <tr>
+                                <th>SN</th>
+                                <th>Başlık</th>
+                                <th>Düzenle</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-4">
+
+                    <h3 id="baslik"></h3><hr />
+
+                    <div class="mb-3">
+                        <label>Kategori</label>
+                        <input type="text" class="form-control" id="txtCategory" />
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="hidden" id="txtId" />
+                        <button class="btn btn-primary" id="btnKaydet">Kaydet</button>
+                        <button class="btn btn-secondary" id="btnVazgec">Vazgeç</button>
+                        <button class="btn btn-danger" id="btnSil">Sil</button>
+                    </div>
+                    <div class="alert" id="sonuc"></div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+        </div>
+        <!-- /.row -->
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="~/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="~/AdminLTE/dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="~/AdminLTE/dist/js/demo.js"></script>
+</body>
+</html>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Düzenleme Formunu Gizle
+            $("#txtCategory").val("");
+            $("#txtId").val("");
+            $("#btnVazgec").hide();
+            $("#btnSil").hide();
+
+            // Kategorileri Yükle
+            LoadCategories();
+
+            // Kaydet Butonuna Tıklanınca
+            $("#btnKaydet").click(function () {
+                var name = $("#txtCategory").val();
+                var id = $("#txtId").val();
+
+                if (name == "" || name == null) {
+                    $("#sonuc")
+                        .removeClass()
+                        .addClass("alert alert-danger")
+                        .html("Kategori Adı Giriniz!");
+                    return false;
+                }
+
+                $.ajax({
+                    url: "/Category/CategoryAddEditAjax",
+                    type: "POST",
+                    data: { CategoryID: id, Name: name },
+                    success: function (data) {
+                        if (data.status) {
+                            $("#sonuc")
+                                .removeClass()
+                                .addClass("alert alert-success")
+                                .html(data.message);
+                            LoadCategories();
+                        } else {
+                            $("#sonuc")
+                                .removeClass()
+                                .addClass("alert alert-danger")
+                                .html(data.message);
+                        }
+                    },
+                    error: function (e) { }
+                });
+            });
+
+            // Düzenle Butonuna Tıklanınca
+            $(document).on("click", ".edit", function () {
+                var id = $(this).closest("tr").attr("id");
+                $("#baslik").html("Kayıt Düzenle");
+                $("#btnVazgec").show();
+                $("#btnSil").show();
+                $.ajax({
+                    url: "/Category/CategoryByIdAjax",
+                    type: "GET",
+                    data: { id: id },
+                    success: function (data) {
+                        $("#txtCategory").val(data.name);
+                        $("#txtId").val(data.categoryID);
+                    },
+                    error: function () { }
+                });
+            });
+
+            // Vazgeç Butonuna Tıklanınca
+            $("#btnVazgec").click(function () {
+                $("#txtCategory").val("");
+                $("#txtId").val("");
+                $("#baslik").html("");
+                $("#btnVazgec").hide();
+                $("#btnSil").hide();
+            });
+
+            // Sil Butonuna Tıklanınca
+            $("#btnSil").click(function () {
+                var id = $("#txtId").val();
+                $.ajax({
+                    url: "/Category/CategoryRemoveAjax",
+                    type: "POST",
+                    data: { id: id },
+                    success: function (data) {
+                        if (data.status) {
+                            $("#sonuc")
+                                .removeClass()
+                                .addClass("alert alert-success")
+                                .html(data.message);
+                            LoadCategories();
+                        } else {
+                            $("#sonuc")
+                                .removeClass()
+                                .addClass("alert alert-danger")
+                                .html(data.message);
+                        }
+                    },
+                    error: function () { }
+                });
+            });
+
+            // Kategorileri Yükle
+            function LoadCategories() {
+                $.ajax({
+                    url: "/Category/CategoryListAjax",
+                    type: "GET",
+                    success: function (data) {
+                        var rows = "";
+                        $.each(data, function (index, item) {
+                            rows += "<tr id='" + item.categoryID + "'>";
+                            rows += "<td>" + (index + 1) + "</td>";
+                            rows += "<td>" + item.name + "</td>";
+                            rows += "<td><a href='javascript:void(0);' class='btn btn-primary edit'>Düzenle</a></td>";
+                            rows += "</tr>";
+                        });
+                        $("#tbCategories tbody").html(rows);
+                    },
+                    error: function () { }
+                });
+            }
+        });
+    </script>
+}
+
+
+
+
+

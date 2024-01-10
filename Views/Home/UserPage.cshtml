@@ -1,0 +1,29 @@
+﻿<div class="container mt-5">
+    <div class="text-center">
+        <h2 class="display-4">Profilim</h2>
+        <hr class="my-4" />
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 text-center">
+            <img src="/Photos/pp.png" alt="Profil Fotoğrafı" class="img-fluid rounded-circle shadow-lg" style="width: 200px; border: 4px solid #000;" />
+        </div>
+        <div class="col-md-8">
+            <div class="card" style="background-color: #fff; color: #000;">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">@Model.FullName</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <td class="font-weight-bold">Kullanıcı Adı</td>
+                            <td>@Model.UserName</td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">E-Posta</td>
+                            <td>@Model.Email</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
